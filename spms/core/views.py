@@ -4,6 +4,8 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
 from .models import LeaveRequest, EmployeeProfile
 from .forms import LeaveRequestForm
+from django.contrib.auth import login
+from .forms import UserRegisterForm
 
 @login_required
 def create_leave_request(request):
@@ -75,3 +77,33 @@ def reject_leave(request, leave_id):
     leave.status = 'REJECTED'
     leave.save()
     return redirect('pending_leaves')
+
+def register(request):
+    if request.method == 'POST':
+        form = UserRegisterForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.role = form.cleaned_data['role']
+            user.save()
+
+            EmployeeProfile.objects.create(
+                user=user,
+                department=form.cleaned_data['department'],
+                salary=form.cleaned_data['salary'],
+            )
+
+            login(request, user)
+            return redirect('profile')
+    else:
+        form = UserRegisterForm()
+
+    return render(request, 'core/register.html', {'form': form})
+
+@login_required
+def profile(request):
+    try:
+        profile = request.user.employeeprofile
+    except EmployeeProfile.DoesNotExist:
+        profile = None
+
+    return render(request, 'core/profile.html', {'user': request.user, 'profile': profile})

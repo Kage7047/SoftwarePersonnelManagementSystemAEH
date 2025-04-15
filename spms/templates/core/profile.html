@@ -1,0 +1,11 @@
+<h2>Welcome, {{ user.username }}</h2>
+<p>Email: {{ user.email }}</p>
+<p>Role: {{ user.role }}</p>
+
+{% if profile %}
+    <h3>Employee Profile</h3>
+    <p>Department: {{ profile.department }}</p>
+    <p>Salary: ${{ profile.salary }}</p>
+{% else %}
+    <p>No employee profile found.</p>
+{% endif %}

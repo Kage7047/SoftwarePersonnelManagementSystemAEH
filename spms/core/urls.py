@@ -7,4 +7,6 @@ urlpatterns = [
     path('leave/pending/', views.pending_leave_requests, name='pending_leaves'),
     path('leave/approve/<int:leave_id>/', views.approve_leave, name='approve_leave'),
     path('leave/reject/<int:leave_id>/', views.reject_leave, name='reject_leave'),
+    path('register/', views.register, name='register'),
+    path('profile/', views.profile, name='profile'),
 ]
