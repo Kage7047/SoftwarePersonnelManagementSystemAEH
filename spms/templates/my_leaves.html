@@ -1,0 +1,6 @@
+<h2>My Leave Requests</h2>
+<ul>
+  {% for leave in leaves %}
+    <li>{{ leave.start_date }} to {{ leave.end_date }} - {{ leave.status }}</li>
+  {% endfor %}
+</ul>

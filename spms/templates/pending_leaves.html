@@ -1,0 +1,13 @@
+<h2>Pending Leave Requests</h2>
+
+{% for leave in requests %}
+    <div style="margin-bottom: 10px;">
+        <strong>{{ leave.employee.user.username }}</strong><br>
+        From {{ leave.start_date }} to {{ leave.end_date }}<br>
+        Reason: {{ leave.reason }}<br>
+        <a href="{% url 'approve_leave' leave.id %}">✅ Approve</a>
+        <a href="{% url 'reject_leave' leave.id %}">❌ Reject</a>
+    </div>
+{% empty %}
+    <p>No pending requests.</p>
+{% endfor %}
