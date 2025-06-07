@@ -9,4 +9,5 @@ urlpatterns = [
     path('leave/reject/<int:leave_id>/', views.reject_leave, name='reject_leave'),
     path('register/', views.register, name='register'),
     path('profile/', views.profile, name='profile'),
+
 ]

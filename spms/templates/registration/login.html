@@ -4,6 +4,13 @@
   <title>Login</title>
 </head>
 <body>
+
+  {% if form.errors %}
+    <div style="color: red;">
+      {{ form.errors }}
+    </div>
+  {% endif %}
+
   <h2>Login</h2>
   <form method="post">
     {% csrf_token %}

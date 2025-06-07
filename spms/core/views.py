@@ -82,6 +82,7 @@ def register(request):
     if request.method == 'POST':
         form = UserRegisterForm(request.POST)
         if form.is_valid():
+            print("Form is valid")
             user = form.save(commit=False)
             user.role = form.cleaned_data['role']
             user.save()
@@ -94,16 +95,17 @@ def register(request):
 
             login(request, user)
             return redirect('profile')
+        else:
+            print("Form errors:", form.errors)
     else:
         form = UserRegisterForm()
-
     return render(request, 'core/register.html', {'form': form})
 
 @login_required
 def profile(request):
-    try:
-        profile = request.user.employeeprofile
-    except EmployeeProfile.DoesNotExist:
-        profile = None
-
-    return render(request, 'core/profile.html', {'user': request.user, 'profile': profile})
+    user = request.user
+    profile = getattr(user, 'employeeprofile', None)
+    return render(request, 'core/profile.html', {
+        'user': user,
+        'profile': profile,
+    })
