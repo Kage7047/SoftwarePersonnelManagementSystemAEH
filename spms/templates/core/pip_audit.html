@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>pip-audit Report</title>
+    <style>
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ddd; padding: 8px; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+<h1>pip-audit Results</h1>
+{% if findings %}
+    <table>
+        <tr><th>Package</th><th>Version</th><th>Vulnerabilities</th></tr>
+        {% for pkg in findings %}
+        <tr>
+            <td>{{ pkg.name }}</td>
+            <td>{{ pkg.version }}</td>
+            <td>
+                {% for vuln in pkg.vulns %}
+                    <strong>{{ vuln.id }}</strong>: {{ vuln.description }}<br>
+                    Fix: {{ vuln.fix_versions|join:", " }}<br><br>
+                {% endfor %}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+{% else %}
+    <p>No vulnerabilities found.</p>
+{% endif %}
+<hr>
+<a href="{% url 'dep_scan' %}">View DepScan Report</a>
+</body>
+</html>

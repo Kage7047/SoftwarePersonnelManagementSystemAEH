@@ -17,12 +17,15 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.contrib.auth import views as auth_views
+from core import views as core_views
 
 urlpatterns = [
+    path('admin/security/pip-audit/', core_views.pip_audit_view, name='pip_audit'),
+    path('admin/security/safety-audit/', core_views.view_safety_report, name='safety_audit'),
     path('admin/', admin.site.urls),
     path('login/', auth_views.LoginView.as_view(), name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
-    path('', include('core.urls'))
+    path('', include('core.urls')),
 
 ]
 

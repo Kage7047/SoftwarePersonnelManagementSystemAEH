@@ -1,0 +1,16 @@
+{% extends "core/base.html" %}
+{% load json_tags %}  {# Make sure to load your templatetag file #}
+
+{% block content %}
+<h1 style="margin-bottom: 20px;">{{ title }}</h1>
+
+{% if error %}
+    <p style="color: red;">{{ error }}</p>
+{% elif data %}
+    <div style="font-family: Arial, sans-serif; font-size: 14px;">
+        {% json_table data %}
+    </div>
+{% else %}
+    <p>No data to display.</p>
+{% endif %}
+{% endblock %}

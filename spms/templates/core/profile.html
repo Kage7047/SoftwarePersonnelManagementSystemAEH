@@ -31,7 +31,6 @@
       <li class="list-group-item"><a href="{% url 'assign_task' %}">✅ Assign Tasks</a></li>
       <li class="list-group-item"><a href="{% url 'task_list' %}">🗂 View My Assigned Tasks</a></li>
     {% elif user.role == 'HR' %}
-      <li class="list-group-item"><a href="#hr-dashboard">📊 View HR Dashboard</a></li>
       <li class="list-group-item"><a href="{% url 'assign_task' %}">✅ Assign Tasks</a></li>
       <li class="list-group-item"><a href="{% url 'task_list' %}">🗂 View My Assigned Tasks</a></li>
     {% endif %}

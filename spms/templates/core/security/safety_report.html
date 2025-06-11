@@ -1,0 +1,24 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+<h1>Safety Report</h1>
+
+{% if report %}
+    <ul>
+    {% for issue in report %}
+        <li>
+            <strong>Package:</strong> {{ issue.package_name }} <br/>
+            <strong>Version:</strong> {{ issue.installed_version }} <br/>
+            <strong>Vulnerability:</strong> {{ issue.vulnerability_id }} <br/>
+            <strong>Severity:</strong> {{ issue.severity }} <br/>
+            <strong>Description:</strong> {{ issue.description }} <br/>
+            <strong>Advisory:</strong> <a href="{{ issue.advisory_url }}" target="_blank">{{ issue.advisory_url }}</a>
+        </li>
+        <hr/>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No report found. Run a scan first.</p>
+{% endif %}
+
+<p><a href="{% url 'run_safety_scan' %}">Run Scan Again</a></p>
+{% endblock %}

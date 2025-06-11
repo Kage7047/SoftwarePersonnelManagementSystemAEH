@@ -1,4 +1,14 @@
+import json
+import os
+import subprocess
+
+from django.conf import settings
+from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib import messages
+from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404
+from django.utils.safestring import mark_safe
+from django.views.decorators.csrf import csrf_protect
 
 from .models import LeaveRequest, EmployeeProfile
 from .forms import LeaveRequestForm
@@ -160,3 +170,38 @@ def mark_task_complete(request, task_id):
         return render(request, 'core/error.html', {'message': 'Access denied'})
 
     return redirect('task_list')
+
+@staff_member_required
+def pip_audit_view(request):
+    report_path = os.path.join('reports', 'pip_audit_report.txt')
+    try:
+        with open(report_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+    except FileNotFoundError:
+        content = "pip audit report not found."
+
+    return render(request, 'core/security/report_view.html', {
+        'title': 'Pip Audit Report',
+        'content': content,
+        'is_json': False,
+    })
+
+@staff_member_required
+def view_safety_report(request):
+    report_path = os.path.join('reports', 'safety-report.json')
+    try:
+        with open(report_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+            content = json.dumps(data, indent=4)  # Not used anymore but can be kept
+    except FileNotFoundError:
+        data = None
+        content = "Safety report not found."
+    except json.JSONDecodeError:
+        data = None
+        content = "Invalid JSON format in safety report."
+
+    return render(request, 'core/security/report_view.html', {
+        'title': 'Safety Report',
+        'data': data,
+        'error': content if not data else None,
+    })
