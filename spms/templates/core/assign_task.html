@@ -3,16 +3,14 @@
 
 {% block content %}
 <div class="container mt-4" style="max-width: 600px;">
-  <h2 class="mb-4">Apply for Leave</h2>
+  <h2 class="mb-4">Assign Task</h2>
 
   <form method="post" novalidate>
     {% csrf_token %}
     
     {% for field in form %}
       <div class="mb-3">
-        <label {% if field.id_for_label %}for="{{ field.id_for_label }}"{% endif %} class="form-label">
-          {{ field.label }}
-        </label>
+        <label {% if field.id_for_label %}for="{{ field.id_for_label }}"{% endif %} class="form-label">{{ field.label }}</label>
         {{ field|add_class:"form-control" }}
         {% if field.help_text %}
           <div class="form-text">{{ field.help_text }}</div>
@@ -22,8 +20,8 @@
         {% endfor %}
       </div>
     {% endfor %}
-
-    <button type="submit" class="btn btn-primary">Submit</button>
+    
+    <button type="submit" class="btn btn-primary">Assign</button>
     <a href="{% url 'profile' %}" class="btn btn-secondary ms-2">← Back to Profile</a>
   </form>
 </div>

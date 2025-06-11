@@ -1,11 +1,43 @@
 from django.shortcuts import render, get_object_or_404
 
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required, user_passes_test
 from .models import LeaveRequest, EmployeeProfile
 from .forms import LeaveRequestForm
 from django.contrib.auth import login
 from .forms import UserRegisterForm
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.shortcuts import render, redirect
+from .models import Task
+from .forms import TaskForm
+
+def is_manager(user):
+    return user.is_authenticated and user.role == 'MANAGER'
+
+def is_manager_or_hr(user):
+    return user.is_authenticated and user.role in ['MANAGER', 'HR']
+
+@login_required
+@user_passes_test(is_manager_or_hr)
+def assign_task(request):
+    if request.method == 'POST':
+        form = TaskForm(request.POST)
+        if form.is_valid():
+            task = form.save(commit=False)
+            task.assigned_by = request.user
+            task.save()
+            return redirect('task_list')
+    else:
+        form = TaskForm()
+    return render(request, 'core/assign_task.html', {'form': form})
+
+@login_required
+def task_list(request):
+    if request.user.role == 'EMPLOYEE':
+        tasks = Task.objects.filter(assigned_to=request.user)
+    elif request.user.role in ['MANAGER']:
+        tasks = Task.objects.filter(assigned_by=request.user)
+    else:
+        tasks = Task.objects.all()
+    return render(request, 'core/task_list.html', {'tasks': tasks})
 
 @login_required
 def create_leave_request(request):
@@ -32,10 +64,6 @@ def view_my_leaves(request):
     profile = request.user.employeeprofile
     leaves = LeaveRequest.objects.filter(employee=profile)
     return render(request, 'core/my_leaves.html', {'leaves': leaves})
-
-
-def is_manager(user):
-    return user.is_authenticated and user.role == 'MANAGER'
 
 @user_passes_test(is_manager)
 def review_leave_requests(request):
@@ -103,9 +131,32 @@ def register(request):
 
 @login_required
 def profile(request):
-    user = request.user
-    profile = getattr(user, 'employeeprofile', None)
+    profile = None
+    all_profiles = None
+
+    try:
+        profile = EmployeeProfile.objects.get(user=request.user)
+    except EmployeeProfile.DoesNotExist:
+        pass  # Profile will remain None
+
+    if request.user.role == 'HR':
+        all_profiles = EmployeeProfile.objects.select_related('user')
+
     return render(request, 'core/profile.html', {
-        'user': user,
         'profile': profile,
+        'all_profiles': all_profiles,
     })
+
+@login_required
+def mark_task_complete(request, task_id):
+    task = get_object_or_404(Task, id=task_id)
+
+    # Ensure only the assigned user or maybe manager can mark complete
+    if request.user == task.assigned_to or request.user.role == 'MANAGER':
+        task.status = 'COMPLETED'
+        task.save()
+    else:
+        # Optionally, handle unauthorized access (return error or redirect)
+        return render(request, 'core/error.html', {'message': 'Access denied'})
+
+    return redirect('task_list')

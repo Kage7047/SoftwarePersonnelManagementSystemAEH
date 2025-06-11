@@ -1,34 +1,75 @@
-<h2>Welcome, {{ user.username }}</h2>
-<p><strong>Email:</strong> {{ user.email }}</p>
-<p><strong>Role:</strong> {{ user.role }}</p>
+{% extends 'core/base.html' %}
+{% block content %}
 
-{% if profile %}
+<div class="container mt-4">
+  <h2>Welcome, {{ user.username }}</h2>
+  <p><strong>Email:</strong> {{ user.email }}</p>
+  <p><strong>Role:</strong> {{ user.role }}</p>
+
+  {% if profile %}
     <p><strong>Department:</strong> {{ profile.department }}</p>
 
     {% if user.role == 'HR' %}
-        <p><strong>Salary:</strong> ${{ profile.salary }}</p>
+      <p><strong>Salary:</strong> ${{ profile.salary }}</p>
     {% else %}
-        <p><em>Salary: Hidden (can be requested from HR Manager)</em></p>
+      <p><em>Salary: Hidden (can be requested from HR Manager)</em></p>
     {% endif %}
-{% else %}
-    <p>No employee profile data available.</p>
-{% endif %}
+  {% else %}
+    <p class="text-muted">No employee profile data available.</p>
+  {% endif %}
 
-<hr>
+  <hr>
 
-<h3>Quick Actions</h3>
-<ul>
+  <h4>Quick Actions</h4>
+  <ul class="list-group mb-3">
     {% if user.role == 'EMPLOYEE' %}
-        <li><a href="{% url 'apply_leave' %}">Submit Leave Request</a></li>
-        <li><a href="{% url 'my_leaves' %}">View My Leave Requests</a></li>
+      <li class="list-group-item"><a href="{% url 'apply_leave' %}">📝 Submit Leave Request</a></li>
+      <li class="list-group-item"><a href="{% url 'my_leaves' %}">📋 View My Leave Requests</a></li>
+      <li class="list-group-item"><a href="{% url 'task_list' %}">🗂 My Tasks</a></li>
     {% elif user.role == 'MANAGER' %}
-        <li><a href="{% url 'pending_leaves' %}">Review Leave Requests</a></li>
+      <li class="list-group-item"><a href="{% url 'pending_leaves' %}">📤 Review Leave Requests</a></li>
+      <li class="list-group-item"><a href="{% url 'assign_task' %}">✅ Assign Tasks</a></li>
+      <li class="list-group-item"><a href="{% url 'task_list' %}">🗂 View My Assigned Tasks</a></li>
     {% elif user.role == 'HR' %}
-        <li><a href="{% url 'admin:index' %}">HR Dashboard</a></li>
+      <li class="list-group-item"><a href="#hr-dashboard">📊 View HR Dashboard</a></li>
+      <li class="list-group-item"><a href="{% url 'assign_task' %}">✅ Assign Tasks</a></li>
+      <li class="list-group-item"><a href="{% url 'task_list' %}">🗂 View My Assigned Tasks</a></li>
     {% endif %}
-</ul>
+  </ul>
 
-<form method="post" action="{% url 'logout' %}" style="display:inline;">
+  <form method="post" action="{% url 'logout' %}">
     {% csrf_token %}
-    <button type="submit" class="btn btn-danger">Logout</button>
-</form>
+    <button type="submit" class="btn btn-danger">🚪 Logout</button>
+  </form>
+
+  {% if user.role == 'HR' and all_profiles %}
+    <hr>
+    <h4 id="hr-dashboard">HR Dashboard</h4>
+    <div class="table-responsive">
+      <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Department</th>
+            <th>Position</th>
+            <th>Salary</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for emp in all_profiles %}
+            <tr>
+              <td>{{ emp.user.get_full_name }}</td>
+              <td>{{ emp.user.email }}</td>
+              <td>{{ emp.department }}</td>
+              <td>{{ emp.position }}</td>
+              <td>${{ emp.salary }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% endif %}
+</div>
+
+{% endblock %}

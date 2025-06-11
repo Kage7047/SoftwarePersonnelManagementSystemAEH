@@ -1,7 +1,32 @@
-<h2>My Leave Requests</h2>
-<ul>
-  {% for leave in leaves %}
-    <li>{{ leave.start_date }} to {{ leave.end_date }} - {{ leave.status }}</li>
-  {% endfor %}
-</ul>
-<a href="{% url 'profile' %}" class="btn btn-secondary">← Back to Profile</a>
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="container mt-4" style="max-width: 700px;">
+  <h2 class="mb-4">My Leave Requests</h2>
+
+  {% if leaves %}
+    <ul class="list-group">
+      {% for leave in leaves %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          <span>{{ leave.start_date }} to {{ leave.end_date }}</span>
+          <span class="badge 
+            {% if leave.status == 'Pending' %}
+              bg-warning text-dark
+            {% elif leave.status == 'Approved' %}
+              bg-success
+            {% else %}
+              bg-danger
+            {% endif %}
+          ">
+            {{ leave.status }}
+          </span>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="text-muted">You have no leave requests yet.</p>
+  {% endif %}
+
+  <a href="{% url 'profile' %}" class="btn btn-secondary mt-3">← Back to Profile</a>
+</div>
+{% endblock %}

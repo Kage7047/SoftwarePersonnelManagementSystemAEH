@@ -1,14 +1,30 @@
-<h2>Pending Leave Requests</h2>
+{% extends 'core/base.html' %}
 
-{% for leave in requests %}
-    <div style="margin-bottom: 10px;">
-        <strong>{{ leave.employee.user.username }}</strong><br>
-        From {{ leave.start_date }} to {{ leave.end_date }}<br>
-        Reason: {{ leave.reason }}<br>
-        <a href="{% url 'approve_leave' leave.id %}">✅ Approve</a>
-        <a href="{% url 'reject_leave' leave.id %}">❌ Reject</a>
+{% block content %}
+<div class="container mt-4" style="max-width: 700px;">
+  <h2 class="mb-4">Pending Leave Requests</h2>
+
+  {% if requests %}
+    <div class="list-group">
+      {% for leave in requests %}
+        <div class="list-group-item">
+          <h5 class="mb-1">{{ leave.employee.user.username }}</h5>
+          <p class="mb-1">
+            <strong>From:</strong> {{ leave.start_date }}<br>
+            <strong>To:</strong> {{ leave.end_date }}<br>
+            <strong>Reason:</strong> {{ leave.reason }}
+          </p>
+          <div>
+            <a href="{% url 'approve_leave' leave.id %}" class="btn btn-sm btn-success me-2">✅ Approve</a>
+            <a href="{% url 'reject_leave' leave.id %}" class="btn btn-sm btn-danger">❌ Reject</a>
+          </div>
+        </div>
+      {% endfor %}
     </div>
-{% empty %}
-    <p>No pending requests.</p>
-{% endfor %}
-<a href="{% url 'profile' %}" class="btn btn-secondary">← Back to Profile</a>
+  {% else %}
+    <p class="text-muted">No pending requests.</p>
+  {% endif %}
+
+  <a href="{% url 'profile' %}" class="btn btn-secondary mt-3">← Back to Profile</a>
+</div>
+{% endblock %}

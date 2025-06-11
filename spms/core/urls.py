@@ -9,5 +9,7 @@ urlpatterns = [
     path('leave/reject/<int:leave_id>/', views.reject_leave, name='reject_leave'),
     path('register/', views.register, name='register'),
     path('profile/', views.profile, name='profile'),
-
+    path('tasks/assign/', views.assign_task, name='assign_task'),
+    path('tasks/', views.task_list, name='task_list'),
+    path('task/<int:task_id>/complete/', views.mark_task_complete, name='mark_task_complete'),
 ]

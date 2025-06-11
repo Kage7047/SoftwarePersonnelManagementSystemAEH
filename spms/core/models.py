@@ -1,8 +1,13 @@
+import datetime
+
 from django.db import models
 
 # core/models.py
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.conf import settings
+
+
 
 class User(AbstractUser):
     ROLE_CHOICES = [
@@ -33,9 +38,23 @@ class LeaveRequest(models.Model):
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='PENDING')
     created_at = models.DateTimeField(auto_now_add=True)
 
-class Task(models.Model):
-    assigned_to = models.ForeignKey(EmployeeProfile, on_delete=models.CASCADE)
-    title = models.CharField(max_length=255)
-    description = models.TextField()
-    status = models.CharField(max_length=10, default='TODO')
 
+class Task(models.Model):
+    title = models.CharField(max_length=200)
+    description = models.TextField()
+    assigned_to = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    assigned_by = models.ForeignKey(settings.AUTH_USER_MODEL, default=1, on_delete=models.CASCADE, related_name='created_tasks')
+    created_at = models.DateTimeField(auto_now_add=True, null=True)  # temporarily allow null
+    due_date = models.DateField(default=datetime.date.today)  # provide default to avoid prompt
+    status = models.CharField(
+        max_length=20,
+        choices=[
+            ('PENDING', 'Pending'),
+            ('IN_PROGRESS', 'In Progress'),
+            ('COMPLETED', 'Completed'),
+        ],
+        default='PENDING'
+    )
+
+    def __str__(self):
+        return self.title
